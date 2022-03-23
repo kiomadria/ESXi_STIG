@@ -1,0 +1,10 @@
+---
+cluster_name: "C220-M4-SERVERS"
+vcenter_name: "10.10.10.20"
+vcenter_username: "administrator@vsphere.local"
+syslog: "10.10.10.100"
+logdir: "[]/scratch"
+ntp_server:
+  - 10.10.10.100
+  #- 1.1.1.2
+snmp_in_use: False #True/False

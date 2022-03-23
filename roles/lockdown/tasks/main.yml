@@ -1,0 +1,58 @@
+---
+#lockdown Role
+- name: Remove authorized keys
+  ansible.builtin.file:
+    path: /etc/ssh/keys-root/authorized_keys
+    state: absent
+  tags: ssh
+- name: Add authorized keys file
+  ansible.builtin.file:
+    path: /etc/ssh/keys-root/authorized_keys
+    state: touch
+    mode: u+rw
+  tags: ssh
+- name: cat /etc/ssh/keys-root/authorized_keys
+  command: /bin/cat /etc/ssh/keys-root/authorized_keys
+  register: auth_keys
+  tags: ssh
+- name: SV-239284r674781_rule keys-root/authorized_keys not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239284r674781_rule: is NOT a finding. Output of /etc/ssh/keys-root/authorized_keys is blank: {{ auth_keys.stdout }}"
+  when: auth_keys.stdout == ""
+  tags: ssh
+- name: SV-239284r674781_rule keys-root/authorized_keys is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239284r674781_rule: IS a finding. Output of /etc/ssh/keys-root/authorized_keys should blank: {{ auth_keys.stdout }}"
+  when: auth_keys.stdout != ""
+  tags: ssh
+- name: backup sshd_config
+  copy:
+    src: /etc/ssh/sshd_config
+    dest: /etc/ssh/sshd_config.backup
+  tags:
+    - ssh
+    - copy
+- name: SV-239266r674727_rule,SV-239267r674730_rule,SV-239268r674733_rule,SV-239269r674736_rule,SV-239270r674739_rule,SV-239271r674742_rule,SV-239272r674745_rule,SV-239273r674748_rule,SV-239274r674751_rule,SV-239275r674754_rule,SV-239276r674757_rule,SV-239277r674760_rule,SV-239278r674763_rule,SV-239279r674766_rule,SV-239280r674769_rule,SV-239281r674772_rule,SV-239282r674775_rule,SV-239283r674778_rule,SV-239331r816580_rule	 Copy sshd_config
+  ansible.builtin.copy:
+    src: sshd_config
+    dest: /etc/ssh/sshd_config
+  tags:
+    - ssh
+    - copy
+- name: SV-239258r674703_rule Enable Lockdown Mode
+  community.vmware.vmware_host_lockdown:
+    cluster_name: "{{ cluster_name }}"
+    hostname: "{{ vcenter_name }}"
+    password: "{{ ansible_password }}"
+    username: "{{ vcenter_username }}"
+    validate_certs: no
+#    esxi_hostname:
+#      - 'sfed-esx-05.sfed.lab.local'
+    state: present
+  delegate_to: localhost
