@@ -1,20 +1,46 @@
 ---
 #lockdown Role
+- name: SV-239327r674910_rule SecureBoot check
+  command: /usr/lib/vmware/secureboot/bin/secureBoot.py -s
+  register: secureboot
+  tags:
+    - boot
+- name: SV-239284r674781_rule keys-root/authorized_keys not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239284r674781_rule is NOT a finding: {{ secureboot.stdout_lines }}"
+  when: secureboot.stdout_lines == 'Enabled'
+  tags:
+    - boot
+- name: SV-239284r674781_rule keys-root/authorized_keys is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239284r674781_rule IS a finding: {{ secureboot.stdout_lines }}"
+  when: secureboot.stdout_lines != 'Enabled'
+  tags:
+    - boot
 - name: Remove authorized keys
   ansible.builtin.file:
     path: /etc/ssh/keys-root/authorized_keys
     state: absent
-  tags: ssh
+  tags:
+    - ssh
 - name: Add authorized keys file
   ansible.builtin.file:
     path: /etc/ssh/keys-root/authorized_keys
     state: touch
     mode: u+rw
-  tags: ssh
+  tags:
+    - ssh
 - name: cat /etc/ssh/keys-root/authorized_keys
   command: /bin/cat /etc/ssh/keys-root/authorized_keys
   register: auth_keys
-  tags: ssh
+  tags:
+    - ssh
 - name: SV-239284r674781_rule keys-root/authorized_keys not a finding
   local_action:
     module: lineinfile
@@ -22,7 +48,8 @@
     create: yes
     line: "- SV-239284r674781_rule: is NOT a finding. Output of /etc/ssh/keys-root/authorized_keys is blank: {{ auth_keys.stdout }}"
   when: auth_keys.stdout == ""
-  tags: ssh
+  tags:
+    - ssh
 - name: SV-239284r674781_rule keys-root/authorized_keys is a finding
   local_action:
     module: lineinfile
@@ -30,7 +57,8 @@
     create: yes
     line: "- SV-239284r674781_rule: IS a finding. Output of /etc/ssh/keys-root/authorized_keys should blank: {{ auth_keys.stdout }}"
   when: auth_keys.stdout != ""
-  tags: ssh
+  tags:
+    - ssh
 - name: backup sshd_config
   copy:
     src: /etc/ssh/sshd_config
