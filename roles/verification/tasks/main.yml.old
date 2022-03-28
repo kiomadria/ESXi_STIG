@@ -1,0 +1,254 @@
+---
+- name: Gather config info about all ESXi Hosts
+  community.vmware.vmware_host_config_info:
+    esxi_hostname: "{{ inventory_hostname }}"
+    hostname: "{{ inventory_hostname }}"
+    password: "{{ ansible_password }}"
+    username: "{{ ansible_user }}"
+    validate_certs: no
+  register: config_info
+  delegate_to: localhost
+
+- name: create STIG Output file
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "This is the findings report for Host {{ inventory_hostname }} using STIG Checklist U_VMware_vSphere_6-0_ESXi_V1R5_STIG"
+    insertbefore: BOF
+
+- name: Gather service info about all ESXi Hosts
+  community.vmware.vmware_host_service_info:
+    hostname: "{{ inventory_hostname }}"
+    password: "{{ ansible_password }}"
+    username: "{{ ansible_user }}"
+    esxi_hostname: "{{ inventory_hostname }}"
+    validate_certs: no
+  register: service_info
+  delegate_to: localhost
+
+- name: Gather NTP Information about all ESXi Hosts
+  community.vmware.vmware_host_ntp_info:
+    hostname: "{{ inventory_hostname }}"
+    password: "{{ ansible_password }}"
+    username: "{{ ansible_user }}"
+    esxi_hostname: "{{ inventory_hostname }}"
+    validate_certs: no
+  register: ntp_info
+  delegate_to: localhost
+
+- name: set facts
+  set_fact:
+  #set fact for configs
+    esxAdmins: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Config.HostAgent.plugins.hostsvc.esxAdminsGroup'] }}"
+    DCUIAccess: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['DCUI.Access'] }}"
+    UserVarsDcuiTimeOut: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['UserVars.DcuiTimeOut'] }}"
+    SysloggloballogHost: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Syslog.global.logHost'] }}"
+    SecurityAccountLockFailures: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Security.AccountLockFailures'] }}"
+    SecurityAccountUnlockTime: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Security.AccountUnlockTime'] }}"
+    AnnotationsWelcomeMessage: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Annotations.WelcomeMessage'] }}"
+    ConfigEtcissue: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Config.Etc.issue'] }}"
+    ConfigHostAgentloglevel: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Config.HostAgent.log.level'] }}"
+    ConfigHostAgentpluginssoloenableMob: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Config.HostAgent.plugins.solo.enableMob'] }}"
+
+  #set facts for services
+    duci_service: "{{ service_info.host_service_info[ansible_hostname + '.' + ansible_domain][0].key }}"
+    duci_service_running: "{{ service_info.host_service_info[ansible_hostname + '.' + ansible_domain][0].running }}"
+    duci_service_policy: "{{ service_info.host_service_info[ansible_hostname + '.' + ansible_domain][0].policy }}"
+    tsm_service: "{{ service_info.host_service_info[ansible_hostname + '.' + ansible_domain][1].key }}"
+    tsm_service_running: "{{ service_info.host_service_info[ansible_hostname + '.' + ansible_domain][1].running }}"
+    tsm_service_policy: "{{ service_info.host_service_info[ansible_hostname + '.' + ansible_domain][1].policy }}"
+    ntp_service: "{{ service_info.host_service_info[ansible_hostname + '.' + ansible_domain][5].key }}"
+    ntp_service_running: "{{ service_info.host_service_info[ansible_hostname + '.' + ansible_domain][5].running }}"
+    ntp_service_policy: "{{ service_info.host_service_info[ansible_hostname + '.' + ansible_domain][5].policy }}"
+  #set NTP servers
+    ntp_server: "{{ ntp_info.hosts_ntp_info[ansible_hostname + '.' + ansible_domain][0].ntp_servers }}"
+#esxi shell service
+- name: Rule ID SV-239310r674859_rule Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID: SV-239310r674859_rule IS a finding the ESXi Shell service is running: {{ tsm_service_running }} and the policy is set to {{ tsm_service_policy }}"
+  when: tsm_service_running == True or tsm_service_policy == 'on'
+- name: Rule ID SV-239310r674859_rule Not a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID: SV-239310r674859_rule is NOT finding the ESXi Shell service is running: {{ tsm_service_running }} and the policy is set to {{ tsm_service_policy }}"
+  when: tsm_service_running != True and tsm_service_policy == 'off'
+#ntp
+- name: Rule ID SV-2390301r674832_rule Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID: SV-2390301r674832_rule IS a finding the NTP service is running: {{ ntp_service_running }}, the policy is set to {{ ntp_service_policy }} and the NTP servers are set to {{ ntp_server }}"
+  when: ntp_service_running == True or ntp_service_policy == 'on' or ntp_server != '[]'
+- name: Rule ID SV-2390301r674832_rule Not a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID: SV-2390301r674832_rule is NOT a finding the NTP service is running: {{ ntp_service_running }}, the policy is set to {{ ntp_service_policy }} and the NTP servers are set to {{ ntp_server }}"
+  when: ntp_service_running == False and ntp_service_policy == 'off' and ntp_server == '[]'
+
+- name: Rule ID SV-239294r674811_rule Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239294r674811_rule IS a finding, Config.HostAgent.plugins.hostsvc.esxAdminsGroup: {{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Config.HostAgent.plugins.hostsvc.esxAdminsGroup'] }}"
+  when: esxAdmins.find("ESX Admins") != -1
+- name: Rule ID SV-239294r674811_rule Not a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239294r674811_rule IS NOT  a finding, Config.HostAgent.plugins.hostsvc.esxAdminsGroup: {{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Config.HostAgent.plugins.hostsvc.esxAdminsGroup'] }}"
+  when: esxAdmins.find("ESX Admins") == -1
+
+- name: Rule ID SV-239288r674793_rule check
+  shell: grep -i "^password" /etc/pam.d/passwd | grep sufficient
+  register: v63233_output
+- name: Rule ID SV-239288r674793_rule Not a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239288r674793_rule IS NOT a finding. {{ v63233_output.stdout }}"
+  when: v63233_output.stdout.find("sha512") != -1
+- name: Rule ID SV-239288r674793_rule IS a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239288r674793_rule IS a finding. Missing 'sha512' from line: {{ v63233_output.stdout }}"
+  when: v63233_output.stdout.find("sha512") == -1
+
+- name: Rule ID SV-239259r674706_rule output is not a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239259r674706_rule IS NOT a finding. {{ DCUIAccess }}"
+  when: DCUIAccess == 'root'
+- name: Rule ID SV-239259r674706_rule output is a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239259r674706_rule IS a finding.  {{ DCUIAccess }}"
+  when: DCUIAccess != 'root'
+
+- name: Rule ID SV-239298r674823_rule output is not a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239298r674823_rule IS NOT a finding. {{ DCUIAccess }}"
+  when: UserVarsDcuiTimeOut == '120'
+- name: Rule ID SV-239298r674823_rule output is a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239298r674823_rule IS a finding.  {{ DCUIAccess }}"
+  when: UserVarsDcuiTimeOut != '120'
+
+- name: Rule ID SV-239262r674715_rule output is not a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239262r674715_rule IS NOT a finding. Security.AccountLockFailures: {{ SecurityAccountLockFailures }}"
+  when: SecurityAccountLockFailures == '3'
+- name: Rule ID SV-239262r674715_rule output is a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239262r674715_rule IS a finding.  Security.AccountLockFailures: {{ SecurityAccountLockFailures }}"
+  when: SecurityAccountLockFailures != '3'
+
+- name: Rule ID SV-239263r674718_rule output is not a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239263r674718_rule IS NOT a finding. Security.AccountUnlockTime: {{ SecurityAccountUnlockTime }}"
+  when: SecurityAccountUnlockTime == '900'
+- name: Rule ID SV-239263r674718_rule output is a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239263r674718_rule IS a finding.  Security.AccountUnlockTime: {{ SecurityAccountUnlockTime }}"
+  when: SecurityAccountUnlockTime != '900'
+
+- name: Rule ID SV-239285r674784_rule output is not a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239285r674784_rule IS NOT a finding. Config.HostAgent.log.level: {{ ConfigHostAgentloglevel }}"
+  when: ConfigHostAgentloglevel == 'info'
+- name: Rule ID SV-239285r674784_rule output is a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239285r674784_rule IS a finding.  Config.HostAgent.log.level: {{ ConfigHostAgentloglevel }}"
+  when: ConfigHostAgentloglevel != 'info'
+
+- name: Rule ID SV-239289r674796_rule output is not a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239289r674796_rule IS NOT a finding. Config.HostAgent.plugins.solo.enableMob: {{ ConfigHostAgentpluginssoloenableMob }}"
+  when: ConfigHostAgentpluginssoloenableMob == False
+- name: Rule ID SV-239289r674796_rule output is a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239289r674796_rule IS a finding.  Config.HostAgent.plugins.solo.enableMob: {{ ConfigHostAgentpluginssoloenableMob }}"
+  when: ConfigHostAgentpluginssoloenableMob != False
+
+- name: Rule ID SV-239261r674712_rule output is not a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239261r674712_rule is NOT a finding. Syslog servers:  {{ SysloggloballogHost }}"
+  when: SysloggloballogHost != '[]'
+- name: Rule ID SV-239261r674712_rule output is  a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239261r674712_rule IS a finding. Syslog servers:  {{ SysloggloballogHost }}"
+  when: SysloggloballogHost == '[]'
+
+#manual Review
+- name: create STIG Output file
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "****** Manual Review the following Items ******"
+
+- name: Rule ID SV-239264r674721_rule Review
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239264r674721_rule Review the banner:  {{ AnnotationsWelcomeMessage }}"
+- name: Rule ID SV-239265r674724_rule  Review
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239265r674724_rule Review the banner:  {{ ConfigEtcissue }}"
