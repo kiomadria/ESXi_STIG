@@ -73,14 +73,14 @@
   tags:
     - ssh
     - copy
-- name: SV-239258r674703_rule Enable Lockdown Mode
-  community.vmware.vmware_host_lockdown:
-    cluster_name: "{{ cluster_name }}"
-    hostname: "{{ vcenter_name }}"
-    password: "{{ ansible_password }}"
-    username: "{{ vcenter_username }}"
-    validate_certs: no
+#- name: SV-239258r674703_rule Enable Lockdown Mode
+#  community.vmware.vmware_host_lockdown:
+#    cluster_name: "{{ cluster_name }}"
+#    hostname: "{{ vcenter_name }}"
+#    password: "{{ ansible_password }}"
+#    username: "{{ vcenter_username }}"
+#    validate_certs: no
 #    esxi_hostname:
 #      - 'sfed-esx-05.sfed.lab.local'
-    state: present
-  delegate_to: localhost
+#    state: present
+#  delegate_to: localhost

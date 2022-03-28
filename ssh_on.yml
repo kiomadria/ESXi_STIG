@@ -1,0 +1,23 @@
+- name: Enable SSH Access to ESXi Hosts in cluster
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - vars/main.yml
+  tasks:
+    - name: Turn on SSH access to ESX hosts
+      community.vmware.vmware_host_service_manager:
+        hostname: '{{ vcenter_name }}'
+        username: '{{ vcenter_username }}'
+        password: '{{ vcenter_password }}'
+        cluster_name: '{{ cluster_name }}'
+        validate_certs: no
+        service_name: TSM-SSH
+        state: present
+    - name: Disable Lockdown mode
+      community.vmware.vmware_host_lockdown:
+        cluster_name: "{{ cluster_name }}"
+        hostname: "{{ vcenter_name }}"
+        password: "{{ vcenter_password }}"
+        username: "{{ vcenter_username }}"
+        validate_certs: no
+        state: absent

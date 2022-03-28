@@ -67,18 +67,18 @@
     - snmp
     - service
 
-- name: SV-239290r674799_rule Stop SSH Service
-  community.vmware.vmware_host_service_manager:
-    cluster_name: "{{ cluster_name }}"
-    #esxi_hostname: "{{ inventory_hostname }}"
-    hostname: "{{ vcenter_name }}"
-    password: "{{ ansible_password }}"
-    username: "{{ vcenter_username }}"
-    validate_certs: no
-    service_name: TSM-SSH
-    service_policy: off
-    state: absent
-  delegate_to: localhost
-  tags:
-    - ssh
-    - service
+#- name: SV-239290r674799_rule Stop SSH Service
+#  community.vmware.vmware_host_service_manager:
+#    cluster_name: "{{ cluster_name }}"
+#    #esxi_hostname: "{{ inventory_hostname }}"
+#    hostname: "{{ vcenter_name }}"
+#    password: "{{ ansible_password }}"
+#    username: "{{ vcenter_username }}"
+#    validate_certs: no
+#    service_name: TSM-SSH
+#    service_policy: off
+#    state: absent
+#  delegate_to: localhost
+#  tags:
+#    - ssh
+#    - service

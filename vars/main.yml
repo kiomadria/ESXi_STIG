@@ -2,6 +2,7 @@
 cluster_name: "C220-M4-SERVERS"
 vcenter_name: "10.10.10.20"
 vcenter_username: "administrator@vsphere.local"
+vcenter_password: 
 syslog: "10.10.10.100"
 logdir: "[]/scratch"
 ntp_server:
