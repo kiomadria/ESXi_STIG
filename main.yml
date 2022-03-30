@@ -1,10 +1,13 @@
 - name: U_VMware_vSphere_6-0_ESXi_V1R5_STIG
   hosts: esx
   gather_facts: true
+  vars:
+    vmotionEnabled: []
+    serviceEnabled: []
   vars_files:
     - vars/main.yml
   roles:
     - advanced_options
     - services
-    - verification
     - lockdown
+    - verification

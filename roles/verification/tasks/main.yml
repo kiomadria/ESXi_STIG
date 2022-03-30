@@ -1,4 +1,5 @@
 ---
+#verifcation
 - name: Gather config info about all ESXi Hosts
   community.vmware.vmware_host_config_info:
     esxi_hostname: "{{ inventory_hostname }}"
@@ -40,82 +41,84 @@
 - name: set facts
   set_fact:
   #set fact for configs
-    esxAdmins: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Config.HostAgent.plugins.hostsvc.esxAdminsGroup'] }}"
-    DCUIAccess: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['DCUI.Access'] }}"
-    UserVarsDcuiTimeOut: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['UserVars.DcuiTimeOut'] }}"
-    UserVarsESXiShellInteractiveTimeOut: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['UserVars.ESXiShellInteractiveTimeOut'] }}"
-    UserVarsESXiShellTimeOut: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['UserVars.ESXiShellTimeOut'] }}"
-    SysloggloballogHost: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Syslog.global.logHost'] }}"
-    SysloggloballogDir: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Syslog.global.logDir'] }}"
-    SecurityAccountLockFailures: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Security.AccountLockFailures'] }}"
-    SecurityAccountUnlockTime: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Security.AccountUnlockTime'] }}"
-    SecurityPasswordQualityControl: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Security.PasswordQualityControl'] }}"
-    SecurityPasswordHistory: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Security.PasswordHistory'] }}"
-    AnnotationsWelcomeMessage: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Annotations.WelcomeMessage'] }}"
-    ConfigEtcissue: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Config.Etc.issue'] }}"
-    ConfigHostAgentloglevel: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Config.HostAgent.log.level'] }}"
-    ConfigHostAgentpluginssoloenableMob: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Config.HostAgent.plugins.solo.enableMob'] }}"
-    MemShareForceSalting: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Mem.ShareForceSalting'] }}"
-    NetBlockGuestBPDU: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Net.BlockGuestBPDU'] }}"
-    NetDVFilterBindIpAddress: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Net.DVFilterBindIpAddress'] }}"
-    UserVarsSuppressShellWarning: "{{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['UserVars.SuppressShellWarning'] }}"
+  ##[ansible_hostname]
+    esxAdmins: "{{ config_info.hosts_info[ansible_hostname]['Config.HostAgent.plugins.hostsvc.esxAdminsGroup'] }}"
+    DCUIAccess: "{{ config_info.hosts_info[ansible_hostname]['DCUI.Access'] }}"
+    UserVarsDcuiTimeOut: "{{ config_info.hosts_info[ansible_hostname]['UserVars.DcuiTimeOut'] }}"
+    UserVarsESXiShellInteractiveTimeOut: "{{ config_info.hosts_info[ansible_hostname]['UserVars.ESXiShellInteractiveTimeOut'] }}"
+    UserVarsESXiShellTimeOut: "{{ config_info.hosts_info[ansible_hostname]['UserVars.ESXiShellTimeOut'] }}"
+    SysloggloballogHost: "{{ config_info.hosts_info[ansible_hostname]['Syslog.global.logHost'] }}"
+    SysloggloballogDir: "{{ config_info.hosts_info[ansible_hostname]['Syslog.global.logDir'] }}"
+    SecurityAccountLockFailures: "{{ config_info.hosts_info[ansible_hostname]['Security.AccountLockFailures'] }}"
+    SecurityAccountUnlockTime: "{{ config_info.hosts_info[ansible_hostname]['Security.AccountUnlockTime'] }}"
+    SecurityPasswordQualityControl: "{{ config_info.hosts_info[ansible_hostname]['Security.PasswordQualityControl'] }}"
+    SecurityPasswordHistory: "{{ config_info.hosts_info[ansible_hostname]['Security.PasswordHistory'] }}"
+    AnnotationsWelcomeMessage: "{{ config_info.hosts_info[ansible_hostname]['Annotations.WelcomeMessage'] }}"
+    ConfigEtcissue: "{{ config_info.hosts_info[ansible_hostname]['Config.Etc.issue'] }}"
+    ConfigHostAgentloglevel: "{{ config_info.hosts_info[ansible_hostname]['Config.HostAgent.log.level'] }}"
+    ConfigHostAgentpluginssoloenableMob: "{{ config_info.hosts_info[ansible_hostname]['Config.HostAgent.plugins.solo.enableMob'] }}"
+    MemShareForceSalting: "{{ config_info.hosts_info[ansible_hostname]['Mem.ShareForceSalting'] }}"
+    NetBlockGuestBPDU: "{{ config_info.hosts_info[ansible_hostname]['Net.BlockGuestBPDU'] }}"
+    NetDVFilterBindIpAddress: "{{ config_info.hosts_info[ansible_hostname]['Net.DVFilterBindIpAddress'] }}"
+    UserVarsSuppressShellWarning: "{{ config_info.hosts_info[ansible_hostname]['UserVars.SuppressShellWarning'] }}"
+    UserVarsESXiVPsDisabledProtocols: "{{ config_info.hosts_info[ansible_hostname]['UserVars.ESXiVPsDisabledProtocols'] }}"
   #set facts for services
-    duci_service: "{{ service_info.host_service_info[ansible_hostname + '.' + ansible_domain][0].key }}"
-    duci_service_running: "{{ service_info.host_service_info[ansible_hostname + '.' + ansible_domain][0].running }}"
-    duci_service_policy: "{{ service_info.host_service_info[ansible_hostname + '.' + ansible_domain][0].policy }}"
-    tsm_service: "{{ service_info.host_service_info[ansible_hostname + '.' + ansible_domain][1].key }}"
-    tsm_service_running: "{{ service_info.host_service_info[ansible_hostname + '.' + ansible_domain][1].running }}"
-    tsm_service_policy: "{{ service_info.host_service_info[ansible_hostname + '.' + ansible_domain][1].policy }}"
-    ntp_service: "{{ service_info.host_service_info[ansible_hostname + '.' + ansible_domain][5].key }}"
-    ntp_service_running: "{{ service_info.host_service_info[ansible_hostname + '.' + ansible_domain][5].running }}"
-    ntp_service_policy: "{{ service_info.host_service_info[ansible_hostname + '.' + ansible_domain][5].policy }}"
+    duci_service: "{{ service_info.host_service_info[ansible_hostname][0].key }}"
+    duci_service_running: "{{ service_info.host_service_info[ansible_hostname][0].running }}"
+    duci_service_policy: "{{ service_info.host_service_info[ansible_hostname][0].policy }}"
+    tsm_service: "{{ service_info.host_service_info[ansible_hostname][1].key }}"
+    tsm_service_running: "{{ service_info.host_service_info[ansible_hostname][1].running }}"
+    tsm_service_policy: "{{ service_info.host_service_info[ansible_hostname][1].policy }}"
+    ntp_service: "{{ service_info.host_service_info[ansible_hostname][5].key }}"
+    ntp_service_running: "{{ service_info.host_service_info[ansible_hostname][5].running }}"
+    ntp_service_policy: "{{ service_info.host_service_info[ansible_hostname][5].policy }}"
   #set NTP servers
-    ntp_server: "{{ ntp_info.hosts_ntp_info[ansible_hostname + '.' + ansible_domain][0].ntp_servers }}"
+    ntp_server: "{{ ntp_info.hosts_ntp_info[ansible_hostname][0].ntp_servers }}"
 #esxi shell service
-- name: Rule ID SV-239310r674859_rule Finding
+- name: Rule ID SV-239291r674802_rule Finding
   local_action:
     module: lineinfile
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
-    line: "- Rule ID: SV-239310r674859_rule IS a finding the ESXi Shell service is running: {{ tsm_service_running }} and the policy is set to {{ tsm_service_policy }}"
+    line: "- Rule ID: SV-239291r674802_rule IS a finding the ESXi Shell service is running: {{ tsm_service_running }} and the policy is set to {{ tsm_service_policy }}"
   when: tsm_service_running == True or tsm_service_policy == 'on'
-- name: Rule ID SV-239310r674859_rule Not a Finding
+- name: Rule ID SV-239291r674802_rule Not a Finding
   local_action:
     module: lineinfile
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
-    line: "- Rule ID: SV-239310r674859_rule is NOT finding the ESXi Shell service is running: {{ tsm_service_running }} and the policy is set to {{ tsm_service_policy }}"
+    line: "- Rule ID: SV-239291r674802_rule is NOT finding the ESXi Shell service is running: {{ tsm_service_running }} and the policy is set to {{ tsm_service_policy }}"
   when: tsm_service_running != True and tsm_service_policy == 'off'
 #ntp
-- name: Rule ID SV-2390301r674832_rule Finding
+- name: Rule ID SV-239301r674832_rule Finding
   local_action:
     module: lineinfile
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
-    line: "- Rule ID: SV-2390301r674832_rule IS a finding the NTP service is running: {{ ntp_service_running }}, the policy is set to {{ ntp_service_policy }} and the NTP servers are set to {{ ntp_server }}"
-  when: ntp_service_running == True or ntp_service_policy == 'on' or ntp_server != '[]'
-- name: Rule ID SV-2390301r674832_rule Not a Finding
+    line: "- Rule ID: SV-239301r674832_rule IS a finding the NTP service is running: {{ ntp_service_running }}, the policy is set to {{ ntp_service_policy }} and the NTP servers are set to {{ ntp_server }}"
+  when: ntp_service_running == False or ntp_service_policy == 'off' or ntp_server == '[]'
+- name: Rule ID SV-239301r674832_rule Not a Finding
   local_action:
     module: lineinfile
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
-    line: "- Rule ID: SV-2390301r674832_rule is NOT a finding the NTP service is running: {{ ntp_service_running }}, the policy is set to {{ ntp_service_policy }} and the NTP servers are set to {{ ntp_server }}"
-  when: ntp_service_running == False and ntp_service_policy == 'off' and ntp_server == '[]'
+    line: "- Rule ID: SV-239301r674832_rule is NOT a finding the NTP service is running: {{ ntp_service_running }}, the policy is set to {{ ntp_service_policy }} and the NTP servers are set to {{ ntp_server }}"
+  when: ntp_service_running == True and ntp_service_policy == 'on' and ntp_server != '[]'
 
 - name: Rule ID SV-239294r674811_rule Finding
   local_action:
     module: lineinfile
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
-    line: "- Rule ID SV-239294r674811_rule IS a finding, Config.HostAgent.plugins.hostsvc.esxAdminsGroup: {{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Config.HostAgent.plugins.hostsvc.esxAdminsGroup'] }}"
-  when: esxAdmins.find("ESX Admins") != -1
+    line: "- Rule ID SV-239294r674811_rule IS a finding, Config.HostAgent.plugins.hostsvc.esxAdminsGroup: {{ config_info.hosts_info[ansible_hostname]['Config.HostAgent.plugins.hostsvc.esxAdminsGroup'] }}"
+  when: esxAdmins.find("ESX Admins") == -1
 - name: Rule ID SV-239294r674811_rule Not a Finding
   local_action:
     module: lineinfile
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
-    line: "- Rule ID SV-239294r674811_rule IS NOT  a finding, Config.HostAgent.plugins.hostsvc.esxAdminsGroup: {{ config_info.hosts_info[ansible_hostname + '.' + ansible_domain]['Config.HostAgent.plugins.hostsvc.esxAdminsGroup'] }}"
-  when: esxAdmins.find("ESX Admins") == -1
+    line: "- Rule ID SV-239294r674811_rule IS NOT  a finding, Config.HostAgent.plugins.hostsvc.esxAdminsGroup: {{ config_info.hosts_info[ansible_hostname]['Config.HostAgent.plugins.hostsvc.esxAdminsGroup'] }}"
+  when: esxAdmins.find("ESX Admins") != -1
 
 - name: Rule ID SV-239288r674793_rule check
   shell: grep -i "^password" /etc/pam.d/passwd | grep sufficient
@@ -140,14 +143,14 @@
     module: lineinfile
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
-    line: "- Rule ID SV-239259r674706_rule IS NOT a finding. {{ DCUIAccess }}"
+    line: "- Rule ID SV-239259r674706_rule IS NOT a finding. DCUI.Access: {{ DCUIAccess }}"
   when: DCUIAccess == 'root'
 - name: Rule ID SV-239259r674706_rule output is a Finding
   local_action:
     module: lineinfile
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
-    line: "- Rule ID SV-239259r674706_rule IS a finding.  {{ DCUIAccess }}"
+    line: "- Rule ID SV-239259r674706_rule IS a finding.   DCUI.Access: {{ DCUIAccess }}"
   when: DCUIAccess != 'root'
 
 - name: Rule ID SV-239298r674823_rule output is not a Finding
@@ -155,14 +158,14 @@
     module: lineinfile
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
-    line: "- Rule ID SV-239298r674823_rule IS NOT a finding. {{ UserVarsDcuiTimeOut }}"
+    line: "- Rule ID SV-239298r674823_rule IS NOT a finding. UserVars.DcuiTimeOut: {{ UserVarsDcuiTimeOut }}"
   when: UserVarsDcuiTimeOut == '120'
 - name: Rule ID SV-239298r674823_rule output is a Finding
   local_action:
     module: lineinfile
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
-    line: "- Rule ID SV-239298r674823_rule IS a finding.  {{ UserVarsDcuiTimeOut }}"
+    line: "- Rule ID SV-239298r674823_rule IS a finding. UserVars.DcuiTimeOut: {{ UserVarsDcuiTimeOut }}"
   when: UserVarsDcuiTimeOut != '120'
 
 - name: Rule ID SV-239262r674715_rule output is not a Finding
@@ -330,36 +333,554 @@
     line: "- Rule ID SV-239316r674877_rule  IS a finding.  Net.DVFilterBindIpAddress: {{ NetDVFilterBindIpAddress }}"
   when: NetDVFilterBindIpAddress != ""
 
-- name: Rule ID SV-239312r674865_rule output is not a Finding
+- name: Rule ID SV-239329r674916_rule output is not a Finding
   local_action:
     module: lineinfile
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
-    line: "- Rule ID SV-239312r674865_rule IS NOT a finding. UserVars.SuppressShellWarning: {{ UserVarsSuppressShellWarning }}"
+    line: "- Rule ID SV-239329r674916_rule IS NOT a finding. UserVars.SuppressShellWarning: {{ UserVarsSuppressShellWarning }}"
   when: UserVarsSuppressShellWarning == "0"
-- name: Rule ID SV-239312r674865_rule output is a Finding
+- name: Rule ID SV-239329r674916_rule output is a Finding
   local_action:
     module: lineinfile
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
-    line: "- Rule ID SV-239312r674865_rule  IS a finding.  UserVars.SuppressShellWarning: {{ UserVarsSuppressShellWarning }}"
+    line: "- Rule ID SV-239329r674916_rule  IS a finding.  UserVars.SuppressShellWarning: {{ UserVarsSuppressShellWarning }}"
   when: UserVarsSuppressShellWarning != "0"
 
+- name: Rule ID SV-239326r674907_rule output is not a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239326r674907_rule IS NOT a finding. UserVars.ESXiVPsDisabledProtocols: {{ UserVarsESXiVPsDisabledProtocols }}"
+  when: UserVarsESXiVPsDisabledProtocols == "0"
+- name: Rule ID SV-239326r674907_rule output is a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239326r674907_rule  IS a finding.  UserVars.ESXiVPsDisabledProtocols: {{ UserVarsESXiVPsDisabledProtocols }}"
+  when: UserVarsESXiVPsDisabledProtocols != "0"
 
-- name: Rule ID SV-239261r674712_rule output is not a Finding
+  #authorized_keys
+- name: cat /etc/ssh/keys-root/authorized_keys
+  command: /bin/cat /etc/ssh/keys-root/authorized_keys
+  register: auth_keys
+- name: SV-239284r674781_rule keys-root/authorized_keys not a finding
   local_action:
     module: lineinfile
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
-    line: "- Rule ID SV-239261r674712_rule is NOT a finding. Syslog servers:  {{ SysloggloballogHost }}"
-  when: SysloggloballogHost != ''
-- name: Rule ID SV-239261r674712_rule output is  a Finding
+    line: "- SV-239284r674781_rule: is NOT a finding. Output of /etc/ssh/keys-root/authorized_keys is blank: {{ auth_keys.stdout }}"
+  when: auth_keys.stdout == ""
+- name: SV-239284r674781_rule keys-root/authorized_keys is a finding
   local_action:
     module: lineinfile
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
-    line: "- Rule ID SV-239261r674712_rule IS a finding. Syslog servers:  {{ SysloggloballogHost }}"
-  when: SysloggloballogHost == ''
+    line: "- SV-239284r674781_rule: IS a finding. Output of /etc/ssh/keys-root/authorized_keys should blank: {{ auth_keys.stdout }}"
+  when: auth_keys.stdout != ""
+
+#sshd_config checks
+- name: SV-239266r674727_rule Check
+  command: grep -i "^Banner" /etc/ssh/sshd_config
+  register: sshdBanner
+  ignore_errors: true
+  tags:
+    - sshd
+- name: SV-239266r674727_rule not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239266r674727_rule: is NOT a finding. Output of grep -i'^Banner' /etc/ssh/sshd_config: {{ sshdBanner.stdout }}"
+  when: sshdBanner.stdout == "Banner /etc/issue"
+  tags:
+    - sshd
+- name: SV-239266r674727_rule is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239266r674727_rule: IS a finding. Output of grep -i'^Banner' /etc/ssh/sshd_config: {{ sshdBanner.stdout }}"
+  when: sshdBanner.stdout != "Banner /etc/issue"
+  tags:
+    - sshd
+
+- name: SV-239267r674730_rule Check
+  command: grep -i "^FipsMode" /etc/ssh/sshd_config
+  register: sshdFips
+  ignore_errors: true
+  tags:
+    - sshd
+- name: SV-239267r674730_rule not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239267r674730_rule: is NOT a finding. Output of grep -i'^FipsMode' /etc/ssh/sshd_config: {{ sshdFips.stdout }}"
+  when: sshdFips.stdout == "FipsMode yes"
+  tags:
+    - sshd
+- name: SV-239267r674730_rule is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239267r674730_rule: IS a finding. Output of grep -i'^FipsMode' /etc/ssh/sshd_config: {{ sshdFips.stdout }}"
+  when: sshdFips.stdout != "FipsMode yes"
+  tags:
+    - sshd
+#
+- name: SV-239268r674733_rule Check
+  command: grep -i "^IgnoreRhosts" /etc/ssh/sshd_config
+  register: sshdIgnoreRhosts
+  ignore_errors: true
+  tags:
+    - sshd
+- name: SV-239268r674733_rule not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239268r674733_rule: is NOT a finding. Output of grep -i'^IgnoreRhosts' /etc/ssh/sshd_config: {{ sshdIgnoreRhosts.stdout }}"
+  when: sshdIgnoreRhosts.stdout == "IgnoreRhosts yes"
+  tags:
+    - sshd
+- name: SV-239268r674733_rule is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239268r674733_rule: IS a finding. Output of grep -i'^IgnoreRhosts' /etc/ssh/sshd_config: {{ sshdIgnoreRhosts.stdout }}"
+  when: sshdIgnoreRhosts.stdout != "IgnoreRhosts yes"
+  tags:
+    - sshd
+
+- name: SV-239269r674736_rule Check
+  command: grep -i "^HostbasedAuthentication" /etc/ssh/sshd_config
+  register: sshdHostbasedAuthentication
+  ignore_errors: true
+  tags:
+    - sshd
+- name: SV-239269r674736_rule not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239269r674736_rule: is NOT a finding. Output of grep -i'^HostbasedAuthentication' /etc/ssh/sshd_config: {{ sshdHostbasedAuthentication.stdout }}"
+  when: sshdHostbasedAuthentication.stdout == "HostbasedAuthentication no"
+  tags:
+    - sshd
+- name: SV-239269r674736_rule is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239269r674736_rule: IS a finding. Output of grep -i'^HostbasedAuthentication' /etc/ssh/sshd_config: {{ sshdHostbasedAuthentication.stdout }}"
+  when: sshdHostbasedAuthentication.stdout != "HostbasedAuthentication no"
+  tags:
+    - sshd
+
+- name: SV-239270r674739_rule Check
+  command: grep -i "^PermitRootLogin" /etc/ssh/sshd_config
+  register: sshdPermitRootLogin
+  ignore_errors: true
+  tags:
+    - sshd
+- name: SV-239270r674739_rule not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239270r674739_rule: is NOT a finding. Output of grep -i'^PermitRootLogin' /etc/ssh/sshd_config: {{ sshdPermitRootLogin.stdout }}"
+  when: sshdPermitRootLogin.stdout == "PermitRootLogin no"
+  tags:
+    - sshd
+- name: SV-239270r674739_rule is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239270r674739_rule: IS a finding. Output of grep -i'^PermitRootLogin' /etc/ssh/sshd_config: {{ sshdPermitRootLogin.stdout }}"
+  when: sshdPermitRootLogin.stdout != "PermitRootLogin no"
+  tags:
+    - sshd
+
+- name: SV-239271r674742_rule Check
+  command: grep -i "^PermitEmptyPasswords" /etc/ssh/sshd_config
+  register: sshdPermitEmptyPasswords
+  ignore_errors: true
+  tags:
+    - sshd
+- name: SV-239271r674742_rule not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239271r674742_rule: is NOT a finding. Output of grep -i'^PermitEmptyPasswords' /etc/ssh/sshd_config: {{ sshdPermitEmptyPasswords.stdout }}"
+  when: sshdPermitEmptyPasswords.stdout == "PermitEmptyPasswords no"
+  tags:
+    - sshd
+- name: SV-239271r674742_rule is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239271r674742_rule: IS a finding. Output of grep -i'^PermitEmptyPasswords' /etc/ssh/sshd_config: {{ sshdPermitEmptyPasswords.stdout }}"
+  when: sshdPermitEmptyPasswords.stdout != "PermitEmptyPasswords no"
+  tags:
+    - sshd
+
+- name: SV-239272r674745_rule Check
+  command: grep -i "^PermitUserEnvironment" /etc/ssh/sshd_config
+  register: sshdPermitUserEnvironment
+  ignore_errors: true
+  tags:
+    - sshd
+- name: SV-239272r674745_rule not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239272r674745_rule: is NOT a finding. Output of grep -i'^PermitUserEnvironment' /etc/ssh/sshd_config: {{ sshdPermitUserEnvironment.stdout }}"
+  when: sshdPermitUserEnvironment.stdout == "PermitUserEnvironment no"
+  tags:
+    - sshd
+- name: SV-239272r674745_rule is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239272r674745_rule: IS a finding. Output of grep -i'^PermitUserEnvironment' /etc/ssh/sshd_config: {{ sshdPermitUserEnvironment.stdout }}"
+  when: sshdPermitUserEnvironment.stdout != "PermitUserEnvironment no"
+  tags:
+    - sshd
+
+- name: SV-239273r674748_rule Check
+  command: grep -i "^GSSAPIAuthentication" /etc/ssh/sshd_config
+  register: sshdGSSAPIAuthentication
+  ignore_errors: true
+  tags:
+    - sshd
+- name: SV-239273r674748_rule not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239273r674748_rule: is NOT a finding. Output of grep -i'^GSSAPIAuthentication' /etc/ssh/sshd_config: {{ sshdGSSAPIAuthentication.stdout }}"
+  when: sshdGSSAPIAuthentication.stdout == "GSSAPIAuthentication no"
+  tags:
+    - sshd
+- name: SV-239273r674748_rule is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239273r674748_rule: IS a finding. Output of grep -i'^GSSAPIAuthentication' /etc/ssh/sshd_config: {{ sshdGSSAPIAuthentication.stdout }}"
+  when: sshdGSSAPIAuthentication.stdout != "GSSAPIAuthentication no"
+  tags:
+    - sshd
+
+- name: SV-239274r674751_rule Check
+  command: grep -i "^KerberosAuthentication" /etc/ssh/sshd_config
+  register: sshdKerberosAuthentication
+  ignore_errors: true
+  tags:
+    - sshd
+- name: SV-239274r674751_rule not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239274r674751_rule: is NOT a finding. Output of grep -i'^KerberosAuthentication' /etc/ssh/sshd_config: {{ sshdKerberosAuthentication.stdout }}"
+  when: sshdKerberosAuthentication.stdout == "KerberosAuthentication no"
+  tags:
+    - sshd
+- name: SV-239274r674751_rule is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239274r674751_rule: IS a finding. Output of grep -i'^KerberosAuthentication' /etc/ssh/sshd_config: {{ sshdKerberosAuthentication.stdout }}"
+  when: sshdKerberosAuthentication.stdout != "KerberosAuthentication no"
+  tags:
+    - sshd
+
+- name: SV-239275r674754_rule Check
+  command: grep -i "^StrictModes" /etc/ssh/sshd_config
+  register: sshdStrictModes
+  ignore_errors: true
+  tags:
+    - sshd
+- name: SV-239275r674754_rule not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239275r674754_rule: is NOT a finding. Output of grep -i'^StrictModes' /etc/ssh/sshd_config: {{ sshdStrictModes.stdout }}"
+  when: sshdStrictModes.stdout == "StrictModes yes"
+  tags:
+    - sshd
+- name: SV-239275r674754_rule is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239275r674754_rule: IS a finding. Output of grep -i'^StrictModes' /etc/ssh/sshd_config: {{ sshdStrictModes.stdout }}"
+  when: sshdStrictModes.stdout != "StrictModes yes"
+  tags:
+    - sshd
+
+- name: SV-239276r674757_rule Check
+  command: grep -i "^Compression" /etc/ssh/sshd_config
+  register: sshdCompression
+  ignore_errors: true
+  tags:
+    - sshd
+- name: SV-239276r674757_rule not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239276r674757_rule: is NOT a finding. Output of grep -i'^Compression' /etc/ssh/sshd_config: {{ sshdCompression.stdout }}"
+  when: sshdCompression.stdout == "Compression no"
+  tags:
+    - sshd
+- name: SV-239276r674757_rule is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239276r674757_rule: IS a finding. Output of grep -i'^Compression' /etc/ssh/sshd_config: {{ sshdCompression.stdout }}"
+  when: sshdCompression.stdout != "Compression no"
+  tags:
+    - sshd
+
+- name: SV-239277r674760_rule Check
+  command: grep -i "^GatewayPorts" /etc/ssh/sshd_config
+  register: sshdGatewayPorts
+  ignore_errors: true
+  tags:
+    - sshd
+- name: SV-239277r674760_rule not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239277r674760_rule: is NOT a finding. Output of grep -i'^GatewayPorts' /etc/ssh/sshd_config: {{ sshdGatewayPorts.stdout }}"
+  when: sshdGatewayPorts.stdout == "GatewayPorts no"
+  tags:
+    - sshd
+- name: SV-239277r674760_rule is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239277r674760_rule: IS a finding. Output of grep -i'^GatewayPorts' /etc/ssh/sshd_config: {{ sshdGatewayPorts.stdout }}"
+  when: sshdGatewayPorts.stdout != "GatewayPorts no"
+  tags:
+    - sshd
+
+- name: SV-239278r674763_rule Check
+  command: grep -i "^X11Forwarding" /etc/ssh/sshd_config
+  register: sshdX11Forwarding
+  ignore_errors: true
+  tags:
+    - sshd
+- name: SV-239278r674763_rule not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239278r674763_rule: is NOT a finding. Output of grep -i'^X11Forwarding' /etc/ssh/sshd_config: {{ sshdX11Forwarding.stdout }}"
+  when: sshdX11Forwarding.stdout == "X11Forwarding no"
+  tags:
+    - sshd
+- name: SV-239278r674763_rule is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239278r674763_rule: IS a finding. Output of grep -i'^X11Forwarding' /etc/ssh/sshd_config: {{ sshdX11Forwarding.stdout }}"
+  when: sshdX11Forwardings.stdout != "X11Forwarding no"
+  tags:
+    - sshd
+
+- name: SV-239279r674766_rule Check
+  command: grep -i "^AcceptEnv" /etc/ssh/sshd_config
+  register: sshdAcceptEnv
+  ignore_errors: true
+  tags:
+    - sshd
+- name: SV-239279r674766_rule not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239279r674766_rule: is NOT a finding. Output of grep -i'^AcceptEnv' /etc/ssh/sshd_config: {{ sshdAcceptEnv.stdout }}"
+  when: sshdAcceptEnv.stdout.find("") != -1
+  tags:
+    - sshd
+- name: SV-239279r674766_rule is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239279r674766_rule: IS a finding. Output of grep -i'^AcceptEnv' /etc/ssh/sshd_config: {{ sshdAcceptEnv.stdout }}"
+  when: sshdAcceptEnv.stdout.find("") == -1
+  tags:
+    - sshd
+
+- name: SV-239280r674769_rule Check
+  command: grep -i "^PermitTunnel" /etc/ssh/sshd_config
+  register: sshdPermitTunnel
+  ignore_errors: true
+  tags:
+    - sshd
+- name: SV-239280r674769_rule not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239280r674769_rule: is NOT a finding. Output of grep -i'^PermitTunnel' /etc/ssh/sshd_config: {{ sshdPermitTunnel.stdout }}"
+  when: sshdPermitTunnel.stdout == "PermitTunnel no"
+  tags:
+    - sshd
+- name: SV-239280r674769_rule is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239280r674769_rule: IS a finding. Output of grep -i'^PermitTunnel' /etc/ssh/sshd_config: {{ sshdPermitTunnel.stdout }}"
+  when: sshdPermitTunnel.stdout != "PermitTunnel no"
+  tags:
+    - sshd
+
+- name: SV-239281r674772_rule Check
+  command: grep -i "^ClientAliveCountMax" /etc/ssh/sshd_config
+  register: sshdClientAliveCountMax
+  ignore_errors: true
+  tags:
+    - sshd
+- name: SV-239281r674772_rule not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239281r674772_rule: is NOT a finding. Output of grep -i'^ClientAliveCountMax' /etc/ssh/sshd_config: {{ sshdClientAliveCountMax.stdout }}"
+  when: sshdClientAliveCountMax.stdout == "ClientAliveCountMax 3"
+  tags:
+    - sshd
+- name: SV-239281r674772_rule is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239281r674772_rule: IS a finding. Output of grep -i'^ClientAliveCountMax' /etc/ssh/sshd_config: {{ sshdClientAliveCountMax.stdout }}"
+  when: sshdClientAliveCountMax.stdout != "ClientAliveCountMax 3"
+  tags:
+    - sshd
+
+- name: SV-239282r674775_rule Check
+  command: grep -i "^ClientAliveInterval" /etc/ssh/sshd_config
+  register: sshdClientAliveInterval
+  ignore_errors: true
+  tags:
+    - sshd
+- name: SV-239282r674775_rule not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239282r674775_rule: is NOT a finding. Output of grep -i'^ClientAliveInterval' /etc/ssh/sshd_config: {{ sshdClientAliveInterval.stdout }}"
+  when: sshdClientAliveInterval.stdout == "ClientAliveInterval 200"
+  tags:
+    - sshd
+- name: SV-239282r674775_rule is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239282r674775_rule: IS a finding. Output of grep -i'^ClientAliveInterval' /etc/ssh/sshd_config: {{ sshdClientAliveInterval.stdout }}"
+  when: sshdClientAliveInterval.stdout != "ClientAliveInterval 200"
+  tags:
+    - sshd
+
+- name: SV-239283r674778_rule Check
+  command: grep -i "^MaxSessions" /etc/ssh/sshd_config
+  register: sshdMaxSessions
+  ignore_errors: true
+  tags:
+    - sshd
+- name: SV-239283r674778_rule not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239283r674778_rule: is NOT a finding. Output of grep -i'^MaxSessions' /etc/ssh/sshd_config: {{ sshdMaxSessions.stdout }}"
+  when: sshdMaxSessions.stdout == "MaxSessions 1"
+  tags:
+    - sshd
+- name: SV-239283r674778_rule is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239283r674778_rule: IS a finding. Output of grep -i'^MaxSessions' /etc/ssh/sshd_config: {{ sshdMaxSessions.stdout }}"
+  when: sshdMaxSessions.stdout != "MaxSessions 1"
+  tags:
+    - sshd
+
+- name: SV-239331r816580_rule Check
+  command: grep -i "^Ciphers" /etc/ssh/sshd_config
+  register: sshdCiphers
+  ignore_errors: true
+  tags:
+    - sshd
+- name: SV-239331r816580_rule not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239331r816580_rule: is NOT a finding. Output of grep -i'^Ciphers' /etc/ssh/sshd_config: {{ sshdCiphers.stdout }}"
+  when: sshdCiphers.stdout == "Ciphers aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr"
+  tags:
+    - sshd
+- name: SV-239331r816580_rule is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239331r816580_rule: IS a finding. Output of grep -i'^Ciphers' /etc/ssh/sshd_config: {{ sshdCiphers.stdout }}"
+  when: sshdCiphers.stdout != "Ciphers aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr"
+  tags:
+    - sshd
+
+- name: SV-239327r674910_rule SecureBoot check
+  command: /usr/lib/vmware/secureboot/bin/secureBoot.py -s
+  register: secureboot
+  tags:
+    - boot
+- name: SV-239284r674781_rule keys-root/authorized_keys not a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239284r674781_rule is NOT a finding: {{ secureboot.stdout_lines }}"
+  when: secureboot.stdout_lines == 'Enabled'
+  tags:
+    - boot
+- name: SV-239284r674781_rule keys-root/authorized_keys is a finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239284r674781_rule IS a finding: {{ secureboot.stdout_lines }}"
+  when: secureboot.stdout_lines != 'Enabled'
+  tags:
+    - boot
 
 #manual Review
 - name: create STIG Output file
@@ -368,6 +889,13 @@
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
     line: "****** Manual Review the following Items ******"
+
+- name: Rule ID SV-239261r674712_rule output is not a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239261r674712_rule Review the Syslog servers:  {{ SysloggloballogHost }}"
 
 - name: Rule ID SV-239264r674721_rule Review
   local_action:
@@ -388,3 +916,118 @@
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
     line: "- Rule ID SV-239300r674829_rule Review the log directory:  {{ SysloggloballogDir }}"
+
+#Networking Review
+- name: Gather vmk info
+  community.vmware.vmware_vmkernel_info:
+    esxi_hostname: "{{ inventory_hostname }}"
+    hostname: "{{ inventory_hostname }}"
+    password: "{{ ansible_password }}"
+    username: "{{ ansible_user }}"
+    validate_certs: no
+  register: vmk_info
+  delegate_to: localhost
+  tags:
+    - vmk
+- name: Gather portgroup info
+  community.vmware.vmware_portgroup_info:
+    esxi_hostname: "{{ inventory_hostname }}"
+    hostname: "{{ inventory_hostname }}"
+    password: "{{ ansible_password }}"
+    username: "{{ ansible_user }}"
+    validate_certs: no
+  register: portgroup_info
+  delegate_to: localhost
+  tags:
+    - vmk
+- set_fact:
+    vmotionEnabled: "{{ vmotionEnabled }} + [ '{{item.portgroup }}' ]"
+  with_items: "{{ vmk_info.host_vmk_info[ansible_hostname + '.' + ansible_domain] }}"
+  when: item.enable_vmotion == True
+  tags:
+    - vmk
+
+- name: verify enable vmotion
+  debug:
+    msg: "{{ item.enable_vmotion }}"
+  loop: "{{ vmk_info.host_vmk_info[ansible_hostname + '.' + ansible_domain] }}"
+  #when: vmk_info.host_vmk_info[ansible_hostname + '.' + ansible_domain].enable_vmotion == True
+  tags:
+    - vmk
+- name: verify enable portgroup
+  debug:
+    msg: "{{ item.portgroup }}"
+  loop: "{{ vmk_info.host_vmk_info[ansible_hostname + '.' + ansible_domain] }}"
+  #when: vmk_info.host_vmk_info[ansible_hostname + '.' + ansible_domain].enable_vmotion == True
+  tags:
+    - vmk
+- name: SV-239303r674838_rule Review
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239303r674838_rule: Ensure that of the following vmks only a single one is set to vMotion"
+  tags:
+    - vmk
+- name: SV-239303r674838_rule Review
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "  {{ item.device }}: enable_vmotion={{ item.enable_vmotion }}"
+  loop: "{{ vmk_info.host_vmk_info[ansible_hostname + '.' + ansible_domain] }}"
+  tags:
+    - vmk
+- name: SV-239303r674838_rule Review
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239303r674838_rule: verify nothing else is using the following portgroup {{ vmotionEnabled }}"
+  tags:
+    - vmk
+
+#Firewall Review
+- name: SV-239310r674859_rule List of services running
+  set_fact:
+    serviceEnabled: "{{ serviceEnabled }} + [ '{{item.key }}' ]"
+  with_items: "{{ service_info.host_service_info[ansible_hostname + '.' + ansible_domain] }}"
+  when: item.running == True
+  tags:
+    - firewall
+
+- name: Gather service info about all ESXi Hosts
+  community.vmware.vmware_host_firewall_info:
+    hostname: "{{ inventory_hostname }}"
+    password: "{{ ansible_password }}"
+    username: "{{ ansible_user }}"
+    esxi_hostname: "{{ inventory_hostname }}"
+    validate_certs: no
+  register: firewall_info
+  delegate_to: localhost
+  tags: firewall
+
+- name: SV-239310r674859_rule Review
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- SV-239310r674859_rule Review the list of running services, then compare them to the firewall rules and the allowed IPs"
+  tags: firewall
+
+- name: SV-239310r674859_rule Review
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "    Running services: {{ serviceEnabled }}"
+  tags: firewall
+
+- name: SV-239310r674859_rule Review
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "    Firewall rules: {{ item.key }} allowed hosts {{ item.allowed_hosts }}"
+  with_items: "{{ firewall_info.hosts_firewall_info[ansible_hostname + '.' + ansible_domain] }}"
+  tags: firewall
