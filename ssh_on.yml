@@ -1,6 +1,11 @@
+
 - name: Enable SSH Access to ESXi Hosts in cluster
   hosts: localhost
   gather_facts: false
+  vars_prompt:
+    - name: vcenter_password
+      prompt: "Enter your vCenter Password"
+      private: yes
   vars_files:
     - vars/main.yml
   tasks:
