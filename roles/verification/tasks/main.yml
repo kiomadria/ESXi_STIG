@@ -42,6 +42,7 @@
   set_fact:
   #set fact for configs
   ##[ansible_hostname]
+  ##[ansible_hostname + '.' + ansible_domain]
     esxAdmins: "{{ config_info.hosts_info[ansible_hostname]['Config.HostAgent.plugins.hostsvc.esxAdminsGroup'] }}"
     DCUIAccess: "{{ config_info.hosts_info[ansible_hostname]['DCUI.Access'] }}"
     UserVarsDcuiTimeOut: "{{ config_info.hosts_info[ansible_hostname]['UserVars.DcuiTimeOut'] }}"
@@ -72,6 +73,8 @@
     ntp_service: "{{ service_info.host_service_info[ansible_hostname][5].key }}"
     ntp_service_running: "{{ service_info.host_service_info[ansible_hostname][5].running }}"
     ntp_service_policy: "{{ service_info.host_service_info[ansible_hostname][5].policy }}"
+    snmp_service_running: "{{ service_info.host_service_info[ansible_hostname][9].running }}"
+    snmp_service_policy: "{{ service_info.host_service_info[ansible_hostname][9].policy }}"
   #set NTP servers
     ntp_server: "{{ ntp_info.hosts_ntp_info[ansible_hostname][0].ntp_servers }}"
 #esxi shell service
@@ -89,6 +92,22 @@
     create: yes
     line: "- Rule ID: SV-239291r674802_rule is NOT finding the ESXi Shell service is running: {{ tsm_service_running }} and the policy is set to {{ tsm_service_policy }}"
   when: tsm_service_running != True and tsm_service_policy == 'off'
+#snmp
+- name: Rule ID SV-239307r674850_rule Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID: SV-239307r674850_rule IS a finding the ESXi Shell service is running: {{ snmp_service_running }} and the policy is set to {{ snmp_service_policy }}"
+  when: snmp_service_running == True or snmp_service_policy == 'on'and snmp_in_use|bool == False
+- name: Rule ID SV-239307r674850_rule Not a Finding
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID: SV-239307r674850_rule is NOT finding the ESXi Shell service is running: {{ snmp_service_running }} and the policy is set to {{ snmp_service_policy }}"
+  when: snmp_service_running != True and snmp_service_policy == 'off'
+
 #ntp
 - name: Rule ID SV-239301r674832_rule Finding
   local_action:
@@ -111,14 +130,14 @@
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
     line: "- Rule ID SV-239294r674811_rule IS a finding, Config.HostAgent.plugins.hostsvc.esxAdminsGroup: {{ config_info.hosts_info[ansible_hostname]['Config.HostAgent.plugins.hostsvc.esxAdminsGroup'] }}"
-  when: esxAdmins.find("ESX Admins") == -1
+  when: esxAdmins.find("ESX Admins") != -1
 - name: Rule ID SV-239294r674811_rule Not a Finding
   local_action:
     module: lineinfile
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
     line: "- Rule ID SV-239294r674811_rule IS NOT  a finding, Config.HostAgent.plugins.hostsvc.esxAdminsGroup: {{ config_info.hosts_info[ansible_hostname]['Config.HostAgent.plugins.hostsvc.esxAdminsGroup'] }}"
-  when: esxAdmins.find("ESX Admins") != -1
+  when: esxAdmins.find("ESX Admins") == -1
 
 - name: Rule ID SV-239288r674793_rule check
   shell: grep -i "^password" /etc/pam.d/passwd | grep sufficient
@@ -354,14 +373,14 @@
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
     line: "- Rule ID SV-239326r674907_rule IS NOT a finding. UserVars.ESXiVPsDisabledProtocols: {{ UserVarsESXiVPsDisabledProtocols }}"
-  when: UserVarsESXiVPsDisabledProtocols == "0"
+  when: UserVarsESXiVPsDisabledProtocols == "tlsv1,tlsv1.1,sslv3"
 - name: Rule ID SV-239326r674907_rule output is a Finding
   local_action:
     module: lineinfile
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
     line: "- Rule ID SV-239326r674907_rule  IS a finding.  UserVars.ESXiVPsDisabledProtocols: {{ UserVarsESXiVPsDisabledProtocols }}"
-  when: UserVarsESXiVPsDisabledProtocols != "0"
+  when: UserVarsESXiVPsDisabledProtocols != "tlsv1,tlsv1.1,sslv3"
 
   #authorized_keys
 - name: cat /etc/ssh/keys-root/authorized_keys
@@ -704,7 +723,7 @@
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
     line: "- SV-239278r674763_rule: IS a finding. Output of grep -i'^X11Forwarding' /etc/ssh/sshd_config: {{ sshdX11Forwarding.stdout }}"
-  when: sshdX11Forwardings.stdout != "X11Forwarding no"
+  when: sshdX11Forwarding.stdout != "X11Forwarding no"
   tags:
     - sshd
 
@@ -863,21 +882,21 @@
   register: secureboot
   tags:
     - boot
-- name: SV-239284r674781_rule keys-root/authorized_keys not a finding
+- name: SV-239327r674910_rule SecureBoot Enabled
   local_action:
     module: lineinfile
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
-    line: "- SV-239284r674781_rule is NOT a finding: {{ secureboot.stdout_lines }}"
+    line: "- SV-239327r674910_rule is NOT a finding: {{ secureboot.stdout_lines }}"
   when: secureboot.stdout_lines == 'Enabled'
   tags:
     - boot
-- name: SV-239284r674781_rule keys-root/authorized_keys is a finding
+- name: SV-239327r674910_rule SecureBoot not Enabled
   local_action:
     module: lineinfile
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
-    line: "- SV-239284r674781_rule IS a finding: {{ secureboot.stdout_lines }}"
+    line: "- SV-239327r674910_rule IS a finding: {{ secureboot.stdout_lines }}"
   when: secureboot.stdout_lines != 'Enabled'
   tags:
     - boot
@@ -942,25 +961,25 @@
     - vmk
 - set_fact:
     vmotionEnabled: "{{ vmotionEnabled }} + [ '{{item.portgroup }}' ]"
-  with_items: "{{ vmk_info.host_vmk_info[ansible_hostname + '.' + ansible_domain] }}"
+  with_items: "{{ vmk_info.host_vmk_info[ansible_hostname] }}"
   when: item.enable_vmotion == True
   tags:
     - vmk
 
-- name: verify enable vmotion
-  debug:
-    msg: "{{ item.enable_vmotion }}"
-  loop: "{{ vmk_info.host_vmk_info[ansible_hostname + '.' + ansible_domain] }}"
-  #when: vmk_info.host_vmk_info[ansible_hostname + '.' + ansible_domain].enable_vmotion == True
-  tags:
-    - vmk
-- name: verify enable portgroup
-  debug:
-    msg: "{{ item.portgroup }}"
-  loop: "{{ vmk_info.host_vmk_info[ansible_hostname + '.' + ansible_domain] }}"
-  #when: vmk_info.host_vmk_info[ansible_hostname + '.' + ansible_domain].enable_vmotion == True
-  tags:
-    - vmk
+#- name: verify enable vmotion
+#  debug:
+#    msg: "{{ item.enable_vmotion }}"
+#  loop: "{{ vmk_info.host_vmk_info[ansible_hostname] }}"
+  #when: vmk_info.host_vmk_info[ansible_hostname].enable_vmotion == True
+#  tags:
+#    - vmk
+#- name: verify enable portgroup
+#  debug:
+#    msg: "{{ item.portgroup }}"
+#  loop: "{{ vmk_info.host_vmk_info[ansible_hostname] }}"
+  #when: vmk_info.host_vmk_info[ansible_hostname].enable_vmotion == True
+#  tags:
+#    - vmk
 - name: SV-239303r674838_rule Review
   local_action:
     module: lineinfile
@@ -974,8 +993,8 @@
     module: lineinfile
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
-    line: "  {{ item.device }}: enable_vmotion={{ item.enable_vmotion }}"
-  loop: "{{ vmk_info.host_vmk_info[ansible_hostname + '.' + ansible_domain] }}"
+    line: "      {{ item.device }}: enable_vmotion={{ item.enable_vmotion }}"
+  loop: "{{ vmk_info.host_vmk_info[ansible_hostname] }}"
   tags:
     - vmk
 - name: SV-239303r674838_rule Review
@@ -987,11 +1006,56 @@
   tags:
     - vmk
 
+- name: Gather vswitch info
+  community.vmware.vmware_vswitch_info:
+    esxi_hostname: "{{ inventory_hostname }}"
+    hostname: "{{ inventory_hostname }}"
+    password: "{{ ansible_password }}"
+    username: "{{ ansible_user }}"
+    validate_certs: no
+  register: vswitch_info
+  delegate_to: localhost
+
+- name: verify vSwitch Security Policy
+  command:
+    cmd: esxcli network vswitch standard policy security get -v {{ item }} #vSwitch0
+  register: secPol
+  with_items: "{{ vswitch_info.hosts_vswitch_info[ansible_hostname] }} "
+
+#- name: secPol
+#  debug:
+#    msg: "{{ item.stdout_lines }}"
+#  with_items: "{{ secPol.results }}"
+
+- name: Rule ID SV-239315r674874_Rule Allow Promiscous
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239315r674874_Rule vswitch: {{item.item}} Should have Allow Promiscuous set to false: {{ item.stdout_lines }}"
+  with_items: "{{ secPol.results }}"
+
+- name: Rule ID SV-239314r674871_Rule Allow MAC Address Change
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239314r674871_Rule vswitch: {{item.item}} Should have Allow MAC Address Change set to false: {{ item.stdout_lines }}"
+  with_items: "{{ secPol.results }}"
+
+- name: Rule ID SV-239313r674868_Rule Allow Forged Trasmits
+  local_action:
+    module: lineinfile
+    path: files/{{ inventory_hostname }}.STIG_output.txt
+    create: yes
+    line: "- Rule ID SV-239313r674868_Rule vswitch: {{item.item}} Should have Allow Forged Transmits set to false: {{ item.stdout_lines }}"
+  with_items: "{{ secPol.results }}"
+
 #Firewall Review
 - name: SV-239310r674859_rule List of services running
   set_fact:
     serviceEnabled: "{{ serviceEnabled }} + [ '{{item.key }}' ]"
-  with_items: "{{ service_info.host_service_info[ansible_hostname + '.' + ansible_domain] }}"
+  with_items: "{{ service_info.host_service_info[ansible_hostname] }}"
   when: item.running == True
   tags:
     - firewall
@@ -1029,5 +1093,5 @@
     path: files/{{ inventory_hostname }}.STIG_output.txt
     create: yes
     line: "    Firewall rules: {{ item.key }} allowed hosts {{ item.allowed_hosts }}"
-  with_items: "{{ firewall_info.hosts_firewall_info[ansible_hostname + '.' + ansible_domain] }}"
+  with_items: "{{ firewall_info.hosts_firewall_info[ansible_hostname] }}"
   tags: firewall

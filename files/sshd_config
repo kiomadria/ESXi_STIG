@@ -20,8 +20,8 @@ SyslogFacility auth
 LogLevel info
 
 #V-63197
-#PermitRootLogin no
-PermitRootLogin yes
+PermitRootLogin no
+#PermitRootLogin yes
 
 PrintMotd yes
 PrintLastLog no
@@ -32,7 +32,8 @@ TCPKeepAlive yes
 X11Forwarding no
 
 #V-63501, V-63189
-Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,aes192-cbc,aes256-cbc
+#Ciphers aes128-ctr,aes192-ctr,aes256-ctr,aes128-cbc,aes192-cbc,aes256-cbc
+Ciphers aes256-gcm@openssh.com,aes128-gcm@openssh.com,aes256-ctr,aes192-ctr,aes128-ctr
 
 #V-63203
 MACs hmac-sha1,hmac-sha2-256,hmac-sha2-512

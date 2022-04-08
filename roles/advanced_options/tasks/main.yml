@@ -208,3 +208,14 @@ By using this IS (which includes any device attached to this IS), you consent to
       "UserVars.SuppressShellWarning": "0"
   delegate_to: localhost
   tags: options
+- name: SV-239326r674907_rule	UserVars.ESXiVPsDisabledProtocols
+  community.vmware.vmware_host_config_manager:
+    esxi_hostname: "{{ inventory_hostname }}"
+    hostname: "{{ inventory_hostname }}"
+    password: "{{ ansible_password }}"
+    username: "{{ ansible_user }}"
+    validate_certs: no
+    options:
+      "UserVars.ESXiVPsDisabledProtocols": "tlsv1,tlsv1.1,sslv3"
+  delegate_to: localhost
+  tags: options
