@@ -1,4 +1,4 @@
-- name: U_VMware_vSphere_6-0_ESXi_V1R5_STIG
+- name: U_VMware_vSphere_6-7_ESXi_V1R2_STIG
   hosts: esx
   gather_facts: true
   vars:
@@ -11,3 +11,5 @@
     - services
     - lockdown
     - verification
+    - vmk
+#    - debug
