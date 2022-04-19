@@ -7,9 +7,9 @@
   vars_files:
     - vars/main.yml
   roles:
-    - advanced_options
     - services
-    - lockdown
-    - verification
     - vmk
+    - lockdown
+    - advanced_options
+    - verification
 #    - debug
