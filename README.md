@@ -10,3 +10,6 @@ Playbook is meant to be run in the Following order
 - ssh_on.yml
 - main.yml
 - ssh_off.yml
+
+Ensure that the following is in the hosts file
+ansible_python_interpreter=/usr/bin/python3
